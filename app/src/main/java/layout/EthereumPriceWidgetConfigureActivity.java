@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.danielhaaser.ethereumwidget.R;
 
@@ -19,18 +21,19 @@ public class EthereumPriceWidgetConfigureActivity extends Activity {
     private static final String PREFS_NAME = "layout.EthereumPriceWidget";
     private static final String PREF_PREFIX_KEY = "appwidget_";
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-    EditText mAppWidgetText;
+//    EditText mAppWidgetText;
+
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             final Context context = EthereumPriceWidgetConfigureActivity.this;
 
             // When the button is clicked, store the string locally
-            String widgetText = mAppWidgetText.getText().toString();
-            saveTitlePref(context, mAppWidgetId, widgetText);
+//            String widgetText = mAppWidgetText.getText().toString();
+//            saveTitlePref(context, mAppWidgetId, widgetText);
 
             // It is the responsibility of the configuration activity to update the app widget
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            EthereumPriceWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+            EthereumPriceWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId, CurrencyPair.BTC_ETH, Exchange.POLONIEX, null);
 
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();
@@ -76,9 +79,23 @@ public class EthereumPriceWidgetConfigureActivity extends Activity {
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
         setResult(RESULT_CANCELED);
-
         setContentView(R.layout.ethereum_price_widget_configure);
-        mAppWidgetText = (EditText) findViewById(R.id.appwidget_text);
+
+        // Populate spinners with options
+        Spinner exchangesSpinner = (Spinner) findViewById(R.id.exchanges);
+        Spinner currencyPairsSpinner = (Spinner) findViewById(R.id.currency_pairs);
+        Spinner timeIntervalSpinner = (Spinner) findViewById(R.id.time_intervals);
+
+        ArrayAdapter exchangesAdapter = ArrayAdapter.createFromResource(this, R.array.exchanges, android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter currencyPairsAdapter = ArrayAdapter.createFromResource(this, R.array.currency_pairs, android.R.layout.simple_spinner_dropdown_item);
+
+        exchangesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        currencyPairsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        exchangesSpinner.setAdapter(exchangesAdapter);
+        currencyPairsSpinner.setAdapter(exchangesAdapter);
+
+
         findViewById(R.id.add_button).setOnClickListener(mOnClickListener);
 
         // Find the widget id from the intent.
@@ -95,7 +112,7 @@ public class EthereumPriceWidgetConfigureActivity extends Activity {
             return;
         }
 
-        mAppWidgetText.setText(loadTitlePref(EthereumPriceWidgetConfigureActivity.this, mAppWidgetId));
+//        mAppWidgetText.setText(loadTitlePref(EthereumPriceWidgetConfigureActivity.this, mAppWidgetId));
     }
 }
 

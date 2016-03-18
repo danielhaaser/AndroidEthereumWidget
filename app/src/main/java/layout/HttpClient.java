@@ -1,6 +1,7 @@
 package layout;
 
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pManager;
 
 import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -14,6 +15,20 @@ import org.json.JSONObject;
 /**
  * Created by daniel on 3/15/16.
  */
+
+interface HttpClientCallback {
+    void receivedDataForCurrencyPairAtExchange(String data, CurrencyPair currencyPair, Exchange exchange);
+}
+
+enum Exchange {
+    POLONIEX
+}
+
+enum CurrencyPair {
+    BTC_ETH,
+    USDT_ETH
+}
+
 public class HttpClient {
 
     private static HttpClient mInstance;
@@ -43,17 +58,27 @@ public class HttpClient {
         getRequestQueue().add(req);
     }
 
-    public void getPoloniexEthPrice() {
-        String url = "https://poloniex.com/public?command=returnTicker";
+    public void getCurrencyPriceAtExchange(final CurrencyPair currencyPair, final Exchange exchange, final HttpClientCallback callback) {
+
+        String url = urlForExchange(exchange);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
+                String lastValue = null;
+
                 try {
-                    JSONObject btcEth = response.getJSONObject("BTC_ETH");
-                    String lastValue = btcEth.getString("last");
-                    System.out.println(lastValue);
+                    switch (exchange) {
+                        case POLONIEX:
+                            String token = stringTokenForCurrencyAtExchange(currencyPair, exchange);
+                            JSONObject btcEth = response.getJSONObject(token);
+                            lastValue = btcEth.getString("last");
+                            break;
+                    }
+
+                    callback.receivedDataForCurrencyPairAtExchange(lastValue, currencyPair, exchange);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -67,5 +92,33 @@ public class HttpClient {
         });
 
         this.addToRequestQueue(jsonObjectRequest);
+    }
+
+    private String urlForExchange(Exchange exchange) {
+
+        String url = "";
+
+        switch (exchange) {
+            case POLONIEX: url = "https://poloniex.com/public?command=returnTicker";
+                break;
+        }
+
+        return url;
+    }
+
+    private String stringTokenForCurrencyAtExchange(CurrencyPair currencyPair, Exchange exchange) {
+
+        String token = "";
+
+        switch (exchange) {
+            case POLONIEX:
+                switch (currencyPair) {
+                    case BTC_ETH: token = "BTC_ETH"; break;
+                    case USDT_ETH: token = "USDT_ETH"; break;
+                }
+                break;
+        }
+
+        return token;
     }
 }

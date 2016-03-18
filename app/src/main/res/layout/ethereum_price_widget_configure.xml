@@ -9,19 +9,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="@string/configure" />
+        android:text="@string/configure"
+        />
 
-    <EditText
-        android:id="@+id/appwidget_text"
+    <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" />
+        android:id="@+id/exchanges"
+        android:spinnerMode="dropdown"
+        android:touchscreenBlocksFocus="false"
+        android:clickable="false"
+        android:entries="@array/exchanges"
+        />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/currency_pairs"
+        android:spinnerMode="dropdown"
+        android:entries="@array/currency_pairs"
+        />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_intervals"
+        android:spinnerMode="dropdown"
+        />
 
     <Button
         android:id="@+id/add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/add_widget" />
+        android:text="@string/add_widget"
+        />
 
 </LinearLayout>
